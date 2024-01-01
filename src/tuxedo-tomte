@@ -230,9 +230,9 @@ my %postConfProgram = (
 #             name = VERSION_CODENAME
 # 
 my %supportedOS = (
-	"Manjaro Linux (unstable)" => {
+	"Manjaro Linux" => {
 		versions => {
-			"rolling" => {
+			"manjaro" => {
 				name => 'vulcan',
 			},
 		},
@@ -304,7 +304,7 @@ my %supportedOS = (
 
 
 my %tuxedo_repos = (
-	"Manjaro 23.1 (unstable)" => {
+	"Manjaro Linux" => {
 		deb => {
 			filename => '',
 			content => '',
@@ -592,7 +592,7 @@ my %tuxedo_mirrors = (
 # "falvour" HAS to be the main mata-package name
 #
 my %flavours = (
-	"rolling" => {
+	"manjaro" => {
 		"linux61" => {
 			installPackages => 'linux61 linux61-headers'
 		},
@@ -3071,8 +3071,8 @@ sub readOSData {
 			$_ =~ /NAME=\"(.*)\"/;
 			$distribution = $1;
 		}
-		if ( $_ =~ /^BUILD_ID=/ ) { #if ( $_ =~ /^VERSION_ID=/ ) {
-			$_ =~ /BUILD_ID=\"(.*)\"/; #$_ =~ /VERSION_ID=\"(.*)\"/;
+		if ( $_ =~ /^ID=/ ) {
+			$_ =~ /ID=\"(.*)\"/;
 			$distributionVersion = $1;
 		}
 	}
