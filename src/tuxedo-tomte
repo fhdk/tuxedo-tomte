@@ -3069,11 +3069,11 @@ sub readOSData {
 	foreach ( @osReleaseLines ) {
 		if ( $_ =~ /^NAME=/ ) {
 			$_ =~ /NAME=\"(.*)\"/;
-			$distribution = $1;
+			$distribution = $_;
 		}
 		if ( $_ =~ /^ID=/ ) {
 			$_ =~ /ID=\"(.*)\"/;
-			$distributionVersion = $1;
+			$distributionVersion = $_;
 		}
 	}
 	$completeDistVersion = $distribution.' '.$distributionVersion;
