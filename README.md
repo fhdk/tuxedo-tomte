@@ -18,6 +18,7 @@ nicht erwünscht wird.
 * perl-file-fcntllock
 * perl-json
 * perl-config-tiny
+* perl-libintl-perl
 
 **Custom repo**
 * perl-edid
