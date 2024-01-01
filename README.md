@@ -10,3 +10,12 @@ Telemetriedaten oder ähnliches zurück!
 Dieses Paket kann ohne Gefahr entfernt werden, falls eine automatisierte
 Installation von nützlichen oder notwendigen Paketen für Ihr TUXEDO-Gerät
 nicht erwünscht wird.
+
+## Adapt to Manjaro
+
+### Perl modules
+**Official repo**
+* perl-file-fcntllock
+
+**Custom repo**
+* perl-edid
