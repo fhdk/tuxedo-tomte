@@ -13,12 +13,12 @@ nicht erwünscht wird.
 
 ## Adapt to Manjaro
 
-### Perl modules
-**Official repo**
+### packages
+* usbutils
 * perl-file-fcntllock
 * perl-json
 * perl-config-tiny
 * perl-libintl-perl
 
-**Custom repo**
+### Custom repo
 * perl-edid
