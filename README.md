@@ -16,6 +16,7 @@ nicht erwünscht wird.
 ### Perl modules
 **Official repo**
 * perl-file-fcntllock
+* perl-json
 
 **Custom repo**
 * perl-edid
