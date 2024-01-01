@@ -36,7 +36,7 @@ use Parse::EDID qw(parse_edid);
 
 use Time::HiRes qw(usleep);
 use Digest::MD5 qw(md5_hex);
-use Dpkg::Version;
+# use Dpkg::Version;                                             # rewrite for Manjaro dpkg -> pacman
 use JSON;
 use Config::Tiny;
 
@@ -103,19 +103,19 @@ my $runningAsRoot = 0;
 my $mode = 'AUTOMATIC'; #default mode
 my $shareDir = '/usr/share/tuxedo-tomte/';
 my $chassisType = 0;
-my $reposList = $shareDir.'repolist.txt';
+my $reposList = $shareDir.'repolist.txt'; # rewrite for Manjaro
 my $distribution;
 my $distributionVersion;
 my $completeDistVersion;
 my $FAI = 0;
 if ($argValue{command} eq 'FAI') {
-	$FAI = 1;
+	$FAI = 0;                                                    # FAI is unsupported - show message - disable FAI setting value to 0
 }
 my $LiveISO = 0;
 my $noNetwork = 0;
-my $packagekitState = 0;
-my $packagekitOriginalState = getSystemdState('packagekit');
-my $packagekitOriginalEnabled = getSystemdEnabled('packagekit');
+my $packagekitState = 0;                                         # packagekit exist for Arch -> add to dependency list
+my $packagekitOriginalState = getSystemdState('packagekit');     # packagekit exist for Arch -> add to dependency list
+my $packagekitOriginalEnabled = getSystemdEnabled('packagekit'); # packagekit exist for Arch -> add to dependency list
 my $triesFile = '/tmp/tomteTries';
 my $triesLimit = 12;
 my $needsRestartFile = '/tmp/needs_restart';
@@ -132,6 +132,7 @@ my %packageHash;
 # kernel package version on target
 my $kernelRelease;
 if ($FAI) {
+	# fai disabled above
 	my $searchCmd = 'dpkg-query -f \'${db:Status-Abbrev} ${Package} ${Version}\n\' -W \'linux-image-*\'';
 	my $dpkgkernel = `$searchCmd`;
 	my %kernelHash = $dpkgkernel =~ /ii (.*) (.*)/g;
@@ -171,30 +172,30 @@ printLog("sessionID: $sessionID", 'TL2');
 # files used by package manager utilities to lock package management
 #
 my %lockFiles = (
-	aptArchivesLock => {
-		filename => '/var/cache/apt/archives/lock',
+	pacmanLock => {  #aptArchivesLock => {
+		filename => '/var/lib/pacman/db.lck', #filename => '/var/cache/apt/archives/lock',
 		FH => '',
 		number => '0',
 		locked => '0',
 	},
-	aptListsLock => {
-		filename => '/var/lib/apt/lists/lock',
-		FH => '',
-		number => '0',
-		locked => '0',
-	},
-	dpkgLock => {
-		filename => '/var/lib/dpkg/lock',
-		FH => '',
-		number => '0',
-		locked => '0',
-	},
-	dpkgLockFrontend => {
-		filename => '/var/lib/dpkg/lock-frontend',
-		FH => '',
-		number => '0',
-		locked => '0',
-	},
+	# aptListsLock => {
+	# 	filename => '/var/lib/pacman/db.lck', #filename => '/var/lib/apt/lists/lock',
+	# 	FH => '',
+	# 	number => '0',
+	# 	locked => '0',
+	# },
+	# dpkgLock => {
+	# 	filename => '/var/lib/pacman/db.lck', #filename => '/var/lib/dpkg/lock',
+	# 	FH => '',
+	# 	number => '0',
+	# 	locked => '0',
+	# },
+	# dpkgLockFrontend => {
+	# 	filename => '/var/lib/pacman/db.lck', #filename => '/var/lib/dpkg/lock-frontend',
+	# 	FH => '',
+	# 	number => '0',
+	# 	locked => '0',
+	# },
 );
 
 
@@ -212,7 +213,7 @@ my %postConfProgram = (
 		description => __('updateGrub_description'),
 	},
 	updateInitramfs => {
-		command => 'update-initramfs -u -k all',
+		command => 'mkinitcpio -P', #command => 'update-initramfs -u -k all',
 		trigger => 0,
 		status => 'undef',
 		description => __('updateInitramfs_description'),
@@ -230,6 +231,13 @@ my %postConfProgram = (
 #             name = VERSION_CODENAME
 # 
 my %supportedOS = (
+	"Manjaro Linux (unstable)" => {
+		versions => {
+			"23.1.1" => {
+				name => 'vulcan',
+			},
+		},
+	},
 	"Ubuntu" => {
 		versions => {
 			"18.04" => {
@@ -297,6 +305,21 @@ my %supportedOS = (
 
 
 my %tuxedo_repos = (
+	"Manjaro 23.1.1 (unstable)" => {
+		deb => {
+			filename => '',
+			content => '',
+		},
+		oibad => {
+			filename => '',
+			content => '',
+		},
+		graphics => {
+			filename => '',
+			content => '',
+		},
+		name => 'vulcan',
+	},
 	"Ubuntu 18.04" => {
 		deb => {
 			filename => '/etc/apt/sources.list.d/tuxedo-computers.list',
@@ -441,6 +464,11 @@ my %tuxedo_repos = (
 
 
 my %tuxedo_mirrors = (
+	"Manjaro Linux 23.1.1 (unstable)" => {
+		mirrors => '/etc/pacman.d/mirrorlist',
+		content => ['https://manjaro.dk/repo/unstable/$repo/$arch'],
+		name => 'vulcan',
+	},
 	"Ubuntu 18.04" => {
 		mirrors => {
 			filename => '/etc/apt/sources.list',
@@ -565,6 +593,17 @@ my %tuxedo_mirrors = (
 # "falvour" HAS to be the main mata-package name
 #
 my %flavours = (
+	"23.1.1" => {
+		"linux61" => {
+			installPackages => 'linux61 linux61-headers'
+		},
+		"linux66" => {
+			installPackages => 'linux66 linux66-headers',
+		},
+		"linux67" => {
+			installPackages => 'linux67 linux67-headers',
+		},
+	},
 	"18.04" => {
 		"linux-generic" => {
 			installPackages => 'linux-generic linux-headers-generic linux-image-generic',
@@ -1281,7 +1320,7 @@ my %tuxedo_devices = (
 		model => ['TUXEDO InfinityBook Pro 14/16 Gen8'],
 		board_name => ['PH4PRX1_PH6PRX1', 'PH4PG31', 'PH6PG01_PH6PG71'],
 		fix => ['tuxedotouchpadswitch', 'disablegucfix'],
-		flavour => ['22.04'],
+		flavour => ['22.04', '23'],
 		pci_id => '',
 		cpu => '',
 		kernel => '',
@@ -3105,34 +3144,34 @@ sub prerequisites {
 	}
 	# wait max. 10 sec. as it takes some time to get network
 	checkNetwork(10,1);
-	my $command = $consoleLanguage.'apt-get update 2>/dev/null';
+	my $command = $consoleLanguage. 'pacman -Sy 2>/dev/null' #'apt-get update 2>/dev/null';
 	my $output = `$command`;
-	printLog("return from apt-get update: $output", 'L2');
+	printLog("return from pacman -Sy: $output", 'L2'); #printLog("return from apt-get update: $output", 'L2');
 	printLog("ending prerequisites", 'L1');
 }
 
 sub prerequisitesFAI {
-	printLog("starting prerequisites FAI", 'TL0');
-	printLog("executing: apt-get update", 'L2');
-	my $command = $consoleLanguage.'apt-get update 2>/dev/null';
-	my $output = `$command`;
-	printLog("return from apt-get update: $output", 'T2');
-	printLog("ending prerequisites FAI", 'TL0');
+	printLog("FAI disabled (pre)", 'TL0'); #printLog("starting prerequisites FAI", 'TL0');
+	# printLog("executing: apt-get update", 'L2');
+	# my $command = $consoleLanguage.'apt-get update 2>/dev/null';
+	# my $output = `$command`;
+	# printLog("return from apt-get update: $output", 'T2');
+	# printLog("ending prerequisites FAI", 'TL0');
 }
 
 sub postrequisitesFAI {
-	printLog("starting postrequisites FAI", 'TL0');
-	if (httpToHttps(\%tuxedo_repos)) {
-		printLog('TUXEDO debian repos set to https', 'L0');
-	}
-	if (httpToHttps(\%tuxedo_mirrors)) {
-		printLog('mirror repos set to https', 'L0');
-	}
-	printLog("executing: apt-get update", 'L2');
-	my $command = $consoleLanguage.'apt-get update 2>/dev/null';
-	my $output = `$command`;
-	printLog("return from apt-get update: $output", 'T2');
-	printLog("ending postrequisites FAI", 'TL0');
+	printLog("FAI disabled (post)", 'TL0'); #printLog("starting postrequisites FAI", 'TL0');
+	# if (httpToHttps(\%tuxedo_repos)) {
+	# 	printLog('TUXEDO debian repos set to https', 'L0');
+	# }
+	# if (httpToHttps(\%tuxedo_mirrors)) {
+	# 	printLog('mirror repos set to https', 'L0');
+	# }
+	# printLog("executing: apt-get update", 'L2');
+	# my $command = $consoleLanguage.'apt-get update 2>/dev/null';
+	# my $output = `$command`;
+	# printLog("return from apt-get update: $output", 'T2');
+	# printLog("ending postrequisites FAI", 'TL0');
 }
 
 
