@@ -131,8 +131,7 @@ my %packageHash;
 # if in FAI it should check which is the installed
 # kernel package version on target
 my $kernelRelease;
-if ($FAI) {
-	# fai disabled above
+if ($FAI) { 	# fai disabled above
 	my $searchCmd = 'dpkg-query -f \'${db:Status-Abbrev} ${Package} ${Version}\n\' -W \'linux-image-*\'';
 	my $dpkgkernel = `$searchCmd`;
 	my %kernelHash = $dpkgkernel =~ /ii (.*) (.*)/g;
@@ -233,7 +232,7 @@ my %postConfProgram = (
 my %supportedOS = (
 	"Manjaro Linux (unstable)" => {
 		versions => {
-			"23.1" => {
+			"rolling" => {
 				name => 'vulcan',
 			},
 		},
@@ -464,7 +463,7 @@ my %tuxedo_repos = (
 
 
 my %tuxedo_mirrors = (
-	"Manjaro Linux 23.1 (unstable)" => {
+	"Manjaro Linux (unstable)" => {
 		mirrors => '/etc/pacman.d/mirrorlist',
 		content => ['https://manjaro.dk/repo/unstable/$repo/$arch'],
 		name => 'vulcan',
@@ -593,7 +592,7 @@ my %tuxedo_mirrors = (
 # "falvour" HAS to be the main mata-package name
 #
 my %flavours = (
-	"23.1" => {
+	"rolling" => {
 		"linux61" => {
 			installPackages => 'linux61 linux61-headers'
 		},
@@ -3072,8 +3071,8 @@ sub readOSData {
 			$_ =~ /NAME=\"(.*)\"/;
 			$distribution = $1;
 		}
-		if ( $_ =~ /^VERSION_ID=/ ) {
-			$_ =~ /VERSION_ID=\"(.*)\"/;
+		if ( $_ =~ /^BUILD_ID=/ ) { #if ( $_ =~ /^VERSION_ID=/ ) {
+			$_ =~ /BUILD_ID=\"(.*)\"/; #$_ =~ /VERSION_ID=\"(.*)\"/;
 			$distributionVersion = $1;
 		}
 	}
