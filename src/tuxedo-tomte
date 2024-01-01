@@ -233,7 +233,7 @@ my %postConfProgram = (
 my %supportedOS = (
 	"Manjaro Linux (unstable)" => {
 		versions => {
-			"23.1.1" => {
+			"23.1" => {
 				name => 'vulcan',
 			},
 		},
@@ -305,7 +305,7 @@ my %supportedOS = (
 
 
 my %tuxedo_repos = (
-	"Manjaro 23.1.1 (unstable)" => {
+	"Manjaro 23.1 (unstable)" => {
 		deb => {
 			filename => '',
 			content => '',
@@ -464,7 +464,7 @@ my %tuxedo_repos = (
 
 
 my %tuxedo_mirrors = (
-	"Manjaro Linux 23.1.1 (unstable)" => {
+	"Manjaro Linux 23.1 (unstable)" => {
 		mirrors => '/etc/pacman.d/mirrorlist',
 		content => ['https://manjaro.dk/repo/unstable/$repo/$arch'],
 		name => 'vulcan',
@@ -593,7 +593,7 @@ my %tuxedo_mirrors = (
 # "falvour" HAS to be the main mata-package name
 #
 my %flavours = (
-	"23.1.1" => {
+	"23.1" => {
 		"linux61" => {
 			installPackages => 'linux61 linux61-headers'
 		},
