@@ -3144,7 +3144,7 @@ sub prerequisites {
 	}
 	# wait max. 10 sec. as it takes some time to get network
 	checkNetwork(10,1);
-	my $command = $consoleLanguage. 'pacman -Sy 2>/dev/null' #'apt-get update 2>/dev/null';
+	my $command = $consoleLanguage. 'pacman -Sy 2>/dev/null'; #'apt-get update 2>/dev/null';
 	my $output = `$command`;
 	printLog("return from pacman -Sy: $output", 'L2'); #printLog("return from apt-get update: $output", 'L2');
 	printLog("ending prerequisites", 'L1');
